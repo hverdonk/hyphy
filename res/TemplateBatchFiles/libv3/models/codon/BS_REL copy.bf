@@ -145,6 +145,11 @@ lfunction models.codon.BS_REL_MSS._DefineQ(bs_rel, namespace) {
        // TODO: change this rate_generator to properly parameterize the synonymous rates for MSS
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
                return models.codon.MSS._GenerateRate_generic (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
+                // synonymous rate components
+                // nonsynonymous rate (=1 for MSS, but not for BUSTED)
+                // omega component (is MSS )
+
+                // synonymous rate
                 ^'models.codon.BS_REL.rate_term', utility.getGlobalValue('terms.parameters.synonymous_rate'),
                 'beta_`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
                 'omega`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.omega_ratio'), component));
