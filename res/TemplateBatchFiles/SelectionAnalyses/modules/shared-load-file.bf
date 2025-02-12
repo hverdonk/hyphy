@@ -266,11 +266,13 @@ function load_file (prefix) {
                     },
                     ...
                 */
-                
-        for (_key_, _value_; in; partitions_and_trees) {
-            (partitions_and_trees[_key_])[utility.getGlobalValue("terms.data.filter_string")] = 
-                    selection.io.adjust_partition_string (_value_[utility.getGlobalValue("terms.data.filter_string")], 3*codon_data_info[utility.getGlobalValue("terms.data.sites")]);
-        }
+          
+             
+            for (_key_, _value_; in; partitions_and_trees) {
+                (partitions_and_trees[_key_])[utility.getGlobalValue("terms.data.filter_string")] = 
+                        selection.io.adjust_partition_string (_value_[utility.getGlobalValue("terms.data.filter_string")], 3*codon_data_info[utility.getGlobalValue("terms.data.sites")]);
+            }
+        
      }   
 
     
@@ -453,7 +455,8 @@ function doGTR (prefix) {
                                         terms.nucleotideRate ("A","C") : { utility.getGlobalValue ("terms.fit.MLE") : 0.25} ,
                                         terms.nucleotideRate ("A","T") : { utility.getGlobalValue ("terms.fit.MLE") : 0.25} ,
                                         terms.nucleotideRate ("C","G") : { utility.getGlobalValue ("terms.fit.MLE") : 0.25} ,
-                                        terms.nucleotideRate ("G","T") : { utility.getGlobalValue ("terms.fit.MLE") : 0.25}
+                                        terms.nucleotideRate ("G","T") : { utility.getGlobalValue ("terms.fit.MLE") : 0.25} ,
+                                        terms.nucleotideRate ("C","T") : { utility.getGlobalValue ("terms.fit.MLE") : 1.00}
                                     }
                                  });
 
@@ -525,7 +528,12 @@ function doGTR (prefix) {
         for (i = 0; i < partition_count; i+=1) {
             (partitions_and_trees[i])[^"terms.data.tree"] = trees[i];
         }
+        
         store_tree_information ();
+        
+        for (index, tree; in; trees) {
+            trees.AdjustZerosToNearZeros (tree, (gtr_results[^"terms.branch_length"])[index]);
+        }
     } else {
         if (kill0 == "Constrain") {
             zero_branch_length_constrain = ^"namespace_tag"+".constrain_zero_branches";
