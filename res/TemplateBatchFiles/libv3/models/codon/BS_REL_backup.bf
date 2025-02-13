@@ -6,7 +6,6 @@ LoadFunctionLibrary("../../UtilityFunctions.bf");
 LoadFunctionLibrary("MG_REV.bf");
 LoadFunctionLibrary("MG_REV_TRIP.bf");
 LoadFunctionLibrary("MG_REV_MH.bf");
-LoadFunctionLibrary("MSS.bf");
 LoadFunctionLibrary("../../convenience/math.bf");
 
 /** @module models.codon.BS_REL
@@ -15,7 +14,6 @@ LoadFunctionLibrary("../../convenience/math.bf");
 
 */
 
-// TODO: do I need to change this to beta for the MSS case? I'm assuming this is defining the reference rate we set to 1
 models.codon.BS_REL.rate_term = "alpha";
 
 /**
@@ -104,74 +102,6 @@ lfunction models.codon.BS_REL_SRV.ModelDescription(type, code, components) {
 	template [utility.getGlobalValue("terms.model.components")] = components;
 	return template;
 }
-
-// BEGIN HANNAH'S CODE
-/**
- * @name models.codon.BS_REL_MSS.ModelDescription
- * @param {String} type
- * @param {String} code
- * @param {Number} components (>=2)
- */
-lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
-
-	template = models.codon.BS_REL.ModelDescription(type, code, components);
-	template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
-	return template;
-}
-
-/**
- * @name models.codon.BS_REL.BS_REL_MSS._DefineQ
- * @param {Dict} mg_rev  // IS THAT STILL TRUE?
- * @param {String} namespace
- * @returns {Dict} updated model
- */
-
-lfunction models.codon.BS_REL_MSS._DefineQ(bs_rel, namespace) {
-
-
-    rate_matrices = {};
-
-    bs_rel [utility.getGlobalValue("terms.model.q_ij")] = &rate_generator;
-    bs_rel [utility.getGlobalValue("terms.mixture.mixture_components")] = {};
-
-    _aux = parameters.GenerateSequentialNames (namespace + ".bsrel_mixture_aux", bs_rel[utility.getGlobalValue("terms.model.components")] - 1, "_");
-    _wts = parameters.helper.stick_breaking (_aux, None);
-    mixture = {};
-
-
-    for (component = 1; component <= bs_rel[utility.getGlobalValue("terms.model.components")]; component += 1) {
-       key = "component_" + component;
-       ExecuteCommands ("
-       // TODO: change this rate_generator to properly parameterize the synonymous rates for MSS
-        function rate_generator (fromChar, toChar, namespace, model_type, model) {
-               return models.codon.MSS._GenerateRate_generic (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
-                // synonymous rate components
-                // nonsynonymous rate (=1 for MSS, but not for BUSTED)
-                // omega component (is MSS )
-
-                // synonymous rate
-                ^'models.codon.BS_REL.rate_term', utility.getGlobalValue('terms.parameters.synonymous_rate'),
-                'beta_`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
-                'omega`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.omega_ratio'), component));
-            }"
-       );
-
-       if ( component < bs_rel[utility.getGlobalValue("terms.model.components")]) {
-            model.generic.AddGlobal ( bs_rel, _aux[component-1], terms.AddCategory (utility.getGlobalValue("terms.mixture.mixture_aux_weight"), component ));
-            parameters.DeclareGlobalWithRanges (_aux[component-1], 0.5, 0, 1);
-       }
-       models.codon.generic.DefineQMatrix(bs_rel, namespace);
-       rate_matrices [key] = bs_rel[utility.getGlobalValue("terms.model.rate_matrix")];
-       (bs_rel [^'terms.mixture.mixture_components'])[key] = _wts [component-1];
-    }
-
-
-    bs_rel[utility.getGlobalValue("terms.model.rate_matrix")] = rate_matrices;
-    parameters.SetConstraint(((bs_rel[utility.getGlobalValue("terms.parameters")])[utility.getGlobalValue("terms.global")])[terms.nucleotideRate("A", "G")], "1", "");
-
-    return bs_rel;
-}
-// END HANNAH'S CODE
 
 /**
  * @name models.codon.BS_REL.BS_REL_Per_Branch_Mixing._DefineQ
