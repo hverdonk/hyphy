@@ -122,6 +122,19 @@ KeywordArgument ("tree",      "A phylogenetic tree (optionally annotated with {}
 KeywordArgument ("branches",  "Branches to test", "All");
 KeywordArgument ("srv", "Include synonymous rate variation in the model", "Yes");
 KeywordArgument ("rates", "The number omega rate classes to include in the model [1-10, default 3]", busted.rate_classes);
+// BEGIN HANNAH CODE
+KeywordArgument ("mss_empirical", "File of empirically estimated MSS rates, to use as a correction when estimating omega", null);
+    /** the use of null as the default argument means that the default expectation is for the 
+        argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
+        I'm not sure how to set up the dialog prompt / choice list title for this one, so I'm leaving it out for now.
+    */
+if (mss_empirical != null) {
+    busted.do_mss = TRUE;
+} else {
+    busted.do_mss = FALSE;
+}
+    // Do I need to update the number of busted.synonymous_rate_classes here?
+// END HANNAH CODE
 
 namespace busted {
     LoadFunctionLibrary ("modules/shared-load-file.bf");
