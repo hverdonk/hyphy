@@ -113,12 +113,13 @@ lfunction models.codon.BS_REL_SRV.ModelDescription(type, code, components) {
  * @param {Number} components (>=2)
  */
 lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
-    io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
+    //io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
 
     //codon_classes = models.codon.MapCode(code);
     template = models.codon.BS_REL.ModelDescription(type, code, components);
 
-    mss_template = models.codon.MSS.ModelDescription(type, code, codon_classes);
+    // same as specifying "Empirical" partitioning to model.codon.MSS.prompt_and_define_freq in MSS.bf
+    mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates (null));
 
     for (key in mss_template) {
         template[key] = mss_template[key];

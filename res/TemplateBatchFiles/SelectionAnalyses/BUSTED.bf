@@ -354,6 +354,7 @@ if (busted.multi_hit == "None") {
 // BEGIN HANNAH CODE
 if (busted.do_mss) {
     // how do I make sure the model description accepts the MSS rate file?
+    // use models.codon.MSS.LoadEmpiricalRates (file) from MSS.bf to specify empirical codon rates to mss_template in BS_REL.bf
     busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
     assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");
     assert (busted.error_sink  == FALSE, "Error sink and MSS combination is currently not supported");  // if all this does is add an extra rate class, it should actually be fine
