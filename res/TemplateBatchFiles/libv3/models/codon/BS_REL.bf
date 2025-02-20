@@ -115,8 +115,17 @@ lfunction models.codon.BS_REL_SRV.ModelDescription(type, code, components) {
 lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
     io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
 
-	template = models.codon.BS_REL.ModelDescription(type, code, components);
-    utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
+    //codon_classes = models.codon.MapCode(code);
+    template = models.codon.BS_REL.ModelDescription(type, code, components);
+
+    mss_template = models.codon.MSS.ModelDescription(type, code, codon_classes);
+
+    for (key in mss_template) {
+        template[key] = mss_template[key];
+    }
+    
+    //template = models.codon.BS_REL.ModelDescription(type, code, components);
+    //utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
 	template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
 	return template;
 }
@@ -143,6 +152,7 @@ lfunction models.codon.BS_REL_MSS._DefineQ(bs_rel, namespace) {
 
     for (component = 1; component <= bs_rel[utility.getGlobalValue("terms.model.components")]; component += 1) {
        key = "component_" + component;
+
        ExecuteCommands ("
        // TODO: change this rate_generator to properly parameterize the synonymous rates for MSS
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
@@ -382,10 +392,6 @@ lfunction models.codon.BS_REL._DefineQ(bs_rel, namespace) {
        key = "component_" + component;
        ExecuteCommands ("
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
-               // BEGIN HANNAH'S CODE
-               console.log('component: ' + key);
-               console.log(')
-               // END HANNAH'S CODE
                return models.codon.MG_REV._GenerateRate_generic (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
                 ^'models.codon.BS_REL.rate_term', utility.getGlobalValue('terms.parameters.synonymous_rate'),
                 'beta_`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
