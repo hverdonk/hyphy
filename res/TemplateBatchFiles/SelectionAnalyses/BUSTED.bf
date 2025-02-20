@@ -122,6 +122,19 @@ KeywordArgument ("tree",      "A phylogenetic tree (optionally annotated with {}
 KeywordArgument ("branches",  "Branches to test", "All");
 KeywordArgument ("srv", "Include synonymous rate variation in the model", "Yes");
 KeywordArgument ("rates", "The number omega rate classes to include in the model [1-10, default 3]", busted.rate_classes);
+// BEGIN HANNAH CODE
+KeywordArgument ("mss_empirical", "File of empirically estimated MSS rates, to use as a correction when estimating omega", null);
+    /** the use of null as the default argument means that the default expectation is for the 
+        argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
+        I'm not sure how to set up the dialog prompt / choice list title for this one, so I'm leaving it out for now.
+    */
+if (mss_empirical != null) {
+    busted.do_mss = TRUE;
+} else {
+    busted.do_mss = FALSE;
+}
+    // Do I need to update the number of busted.synonymous_rate_classes here?
+// END HANNAH CODE
 
 namespace busted {
     LoadFunctionLibrary ("modules/shared-load-file.bf");
@@ -252,7 +265,7 @@ if (busted.run_full_mg94) {
             terms.run_options.partitioned_omega: busted.selected_branches,
             terms.run_options.apply_user_constraints: busted.zero_branch_length_constrain,
             terms.run_options.optimization_settings: {
-                "OPTIMIZATION_METHOD" : "hyrbid"
+                "OPTIMIZATION_METHOD" : "hybrid"
             }
         }, busted.partitioned_mg_results);
 
@@ -319,6 +332,11 @@ if (busted.multi_hit == "None") {
         return def;
     }
     busted.model_generator = "busted.model.BS_REL_MH";
+}
+
+if (busted.do_mss) {
+    assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");
+    assert (busted.error_sink  == FALSE, "Error sink and MSS combination is currently not supported");  // if all this does is add an extra rate class, it should actually be fine
 }
 
 busted.baseline_model_generator = busted.model_generator;
