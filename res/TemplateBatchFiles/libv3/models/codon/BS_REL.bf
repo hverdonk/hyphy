@@ -113,8 +113,10 @@ lfunction models.codon.BS_REL_SRV.ModelDescription(type, code, components) {
  * @param {Number} components (>=2)
  */
 lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
+    io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
 
 	template = models.codon.BS_REL.ModelDescription(type, code, components);
+    utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
 	template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
 	return template;
 }
@@ -144,15 +146,7 @@ lfunction models.codon.BS_REL_MSS._DefineQ(bs_rel, namespace) {
        ExecuteCommands ("
        // TODO: change this rate_generator to properly parameterize the synonymous rates for MSS
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
-               return models.codon.MSS._GenerateRate_generic (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
-                // synonymous rate components
-                // nonsynonymous rate (=1 for MSS, but not for BUSTED)
-                // omega component (is MSS )
-
-                // synonymous rate
-                ^'models.codon.BS_REL.rate_term', utility.getGlobalValue('terms.parameters.synonymous_rate'),
-                'beta_`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
-                'omega`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.omega_ratio'), component));
+               return models.codon.MSS._GenerateRate (fromChar, toChar, namespace, model_type, model);
             }"
        );
 
@@ -195,6 +189,7 @@ lfunction models.codon.BS_REL_Per_Branch_Mixing._DefineQ(bs_rel, namespace) {
 
     for (component = 1; component <= bs_rel[utility.getGlobalValue("terms.model.components")]; component += 1) {
        key = "component_" + component;
+       8test = "component_" + component;
               
        ExecuteCommands ("
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
@@ -387,6 +382,10 @@ lfunction models.codon.BS_REL._DefineQ(bs_rel, namespace) {
        key = "component_" + component;
        ExecuteCommands ("
         function rate_generator (fromChar, toChar, namespace, model_type, model) {
+               // BEGIN HANNAH'S CODE
+               console.log('component: ' + key);
+               console.log(')
+               // END HANNAH'S CODE
                return models.codon.MG_REV._GenerateRate_generic (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
                 ^'models.codon.BS_REL.rate_term', utility.getGlobalValue('terms.parameters.synonymous_rate'),
                 'beta_`component`', terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
