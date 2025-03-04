@@ -106,30 +106,32 @@ lfunction models.codon.BS_REL_SRV.ModelDescription(type, code, components) {
 }
 
 // BEGIN HANNAH'S CODE
-/**
- * @name models.codon.BS_REL_MSS.ModelDescription
- * @param {String} type
- * @param {String} code
- * @param {Number} components (>=2)
- */
-lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
-    //io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
+// /**
+//  * @name models.codon.BS_REL_MSS.ModelDescription
+//  * @param {String} type
+//  * @param {String} code
+//  * @param {Number} components (>=2)
+//  */
+// lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
+//     //io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
 
-    //codon_classes = models.codon.MapCode(code);
-    template = models.codon.BS_REL.ModelDescription(type, code, components);
+//     //codon_classes = models.codon.MapCode(code);
+//     template = models.codon.BS_REL.ModelDescription(type, code, components);
 
-    // same as specifying "Empirical" partitioning to model.codon.MSS.prompt_and_define_freq in MSS.bf
-    mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates (null));
+//     // same as specifying "Empirical" partitioning to model.codon.MSS.prompt_and_define_freq in MSS.bf
+//     mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates (null));
 
-    for (key in mss_template) {
-        template[key] = mss_template[key];
-    }
+
+        // for some reason, this for loop evaluates whether or not MSS is supposed to be running??
+//     for (key in mss_template) {
+//         template[key] = mss_template[key];
+//     }
     
-    //template = models.codon.BS_REL.ModelDescription(type, code, components);
-    //utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
-	template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
-	return template;
-}
+//     //template = models.codon.BS_REL.ModelDescription(type, code, components);
+//     //utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
+// 	template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
+// 	return template;
+// }
 
 /**
  * @name models.codon.BS_REL.BS_REL_MSS._DefineQ

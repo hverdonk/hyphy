@@ -123,40 +123,44 @@ KeywordArgument ("branches",  "Branches to test", "All");
 KeywordArgument ("srv", "Include synonymous rate variation in the model", "Yes");
 KeywordArgument ("rates", "The number omega rate classes to include in the model [1-10, default 3]", busted.rate_classes);
 // BEGIN HANNAH CODE
-KeywordArgument ("mss_empirical", "File of empirically estimated MSS rates, to use as a correction when estimating omega", null);
+KeywordArgument ("mss-empirical", "Use empirically estimated MSS rates as a correction when estimating omega? ['/dev/null' for no]", "/dev/null");
     /** the use of null as the default argument means that the default expectation is for the 
         argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
         I'm not sure how to set up the dialog prompt / choice list title for this one, so I'm leaving it out for now.
     */
-if (mss_empirical != null) {
+busted.mss_tsv = io.PromptUserForFilePath ("Use empirically estimated MSS rates as a correction when estimating omega?  ['/dev/null' for no]");
+
+// busted.do_mss = io.SelectAnOption ({"No" : "Estimate omega with a single overall synonymous substitution rate for all synonymous substitutions.", 
+//                                     "Yes" : "Estimate omega with multiple synonymous substitution rates, provided in a file"
+//                                     });
+// selection.io.json_store_setting  (busted.json, "srv", busted.do_mss);
+
+// busted.mss_tsv == 0 when no argument is provided
+//console.log("path to MSS TSV: " + busted.mss_tsv);
+
+busted.do_mss = FALSE;
+console.log(busted.do_mss);
+if (busted.do_mss) {
+    console.log("'if (busted.do_mss)' ran")
+} 
+
+if (busted.mss_tsv != "/dev/null") {
+    // TODO: figure out how to assign the file (or at least its rates) to the model
+    // KeywordArgument ("mss-rates", "The number alpha rate classes to include in the model");
+    // busted.mss_rate_classes = io.PromptUser ("The number alpha rate classes to include in the model");
+    
+    // TODO: have this ingest the TSV file and use it to set up the model
+    //models.codon.MSS.LoadClassesCodon (file)
+    console.log("can obtain files!");
     busted.do_mss = TRUE;
-} else {
-    busted.do_mss = FALSE;
 }
-    // Do I need to update the number of busted.synonymous_rate_classes here?
+
 // END HANNAH CODE
 
 namespace busted {
     LoadFunctionLibrary ("modules/shared-load-file.bf");
     load_file ("busted");
 }
-
-// BEGIN HANNAH CODE
-KeywordArgument ("mss_empirical", "File of empirically estimated MSS rates, to use as a correction when estimating omega", null);
-    /** the use of null as the default argument means that the default expectation is for the 
-        argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
-        I'm not sure how to set up the dialog prompt / choice list title for this one, so I'm leaving it out for now.
-    */
-
-if (mss_empirical) {
-    busted.do_mss = TRUE;
-} else {
-    busted.do_mss = FALSE;
-}
-// Do I need to update the number of busted.synonymous_rate_classes here?
-// END HANNAH CODE
-
-console.log("mss_empirical: " + mss_empirical);
 
 
 busted.do_srv = io.SelectAnOption ({"Yes" : "Allow synonymous substitution rates to vary from site to site (but not from branch to branch)", 
