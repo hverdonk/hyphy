@@ -124,6 +124,7 @@ lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
 
 
     for (key, value; in; mss_template) {
+        console.log(key);
         template[key] = mss_template[key];
     }
 

@@ -322,6 +322,7 @@ if (busted.multi_hit == "None") {
     // BEGIN HANNAH CODE
     if (busted.do_mss) {
         // specify empirical codon rates to mss_template in BS_REL.bf
+        // MY busted.mss_tsv FILE GETS WIPED AT SOME POINT HERE OR PRIOR TO HERE???
         models.codon.MSS.LoadEmpiricalRates (busted.mss_tsv);
         busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
     } else {
