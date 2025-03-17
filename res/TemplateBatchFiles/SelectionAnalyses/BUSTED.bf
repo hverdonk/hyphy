@@ -122,45 +122,13 @@ KeywordArgument ("tree",      "A phylogenetic tree (optionally annotated with {}
 KeywordArgument ("branches",  "Branches to test", "All");
 KeywordArgument ("srv", "Include synonymous rate variation in the model", "Yes");
 KeywordArgument ("rates", "The number omega rate classes to include in the model [1-10, default 3]", busted.rate_classes);
-// BEGIN HANNAH CODE
-KeywordArgument ("mss-empirical", "Use empirically estimated MSS rates as a correction when estimating omega? ['/dev/null' for no]", "/dev/null");
-    /** the use of null as the default argument means that the default expectation is for the 
-        argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
-        I'm not sure how to set up the dialog prompt / choice list title for this one, so I'm leaving it out for now.
-    */
-busted.mss_tsv = io.PromptUserForFilePath ("Use empirically estimated MSS rates as a correction when estimating omega?  ['/dev/null' for no]");
 
-// busted.do_mss = io.SelectAnOption ({"No" : "Estimate omega with a single overall synonymous substitution rate for all synonymous substitutions.", 
-//                                     "Yes" : "Estimate omega with multiple synonymous substitution rates, provided in a file"
-//                                     });
-// selection.io.json_store_setting  (busted.json, "srv", busted.do_mss);
-
-// busted.mss_tsv == 0 when no argument is provided
-//console.log("path to MSS TSV: " + busted.mss_tsv);
-
-busted.do_mss = FALSE;
-console.log(busted.do_mss);
-if (busted.do_mss) {
-    console.log("'if (busted.do_mss)' ran")
-} 
-
-if (busted.mss_tsv != "/dev/null") {
-    // TODO: figure out how to assign the file (or at least its rates) to the model
-    // KeywordArgument ("mss-rates", "The number alpha rate classes to include in the model");
-    // busted.mss_rate_classes = io.PromptUser ("The number alpha rate classes to include in the model");
-    
-    // TODO: have this ingest the TSV file and use it to set up the model
-    //models.codon.MSS.LoadClassesCodon (file)
-    console.log("can obtain files!");
-    busted.do_mss = TRUE;
-}
-
-// END HANNAH CODE
 
 namespace busted {
     LoadFunctionLibrary ("modules/shared-load-file.bf");
     load_file ("busted");
 }
+
 
 
 busted.do_srv = io.SelectAnOption ({"Yes" : "Allow synonymous substitution rates to vary from site to site (but not from branch to branch)", 
@@ -196,6 +164,7 @@ if (busted.do_srv == "Branch-site") {
 
 busted.rate_classes = io.PromptUser ("The number omega rate classes to include in the model", busted.rate_classes, 1, 10, TRUE);
 
+
 KeywordArgument ("multiple-hits",  "Include support for multiple nucleotide substitutions", "None");
 
 busted.multi_hit = io.SelectAnOption ({
@@ -224,6 +193,32 @@ selection.io.json_store_setting  (busted.json, "error-sink", busted.error_sink);
 if (busted.error_sink) {
     busted.rate_classes += 1;
 }
+
+
+
+
+// BEGIN HANNAH CODE
+KeywordArgument ("mss-empirical", "Use empirically estimated MSS rates as a correction when estimating omega? ['/dev/null' for no]", "/dev/null");
+    /** the use of null as the default argument means that the default expectation is for the 
+        argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
+    */
+
+busted.mss_tsv = io.PromptUserForFilePath ("Use empirically estimated MSS rates as a correction when estimating omega?  [hit enter for no, or provide a file path to MSS corrections file (tsv)]"); 
+busted.do_mss = FALSE;
+if (busted.mss_tsv != "/dev/null") {
+    assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");
+    // TODO: figure out how to assign the file (or at least its rates) to the model
+    // KeywordArgument ("mss-rates", "The number alpha rate classes to include in the model");
+    // busted.mss_rate_classes = io.PromptUser ("The number alpha rate classes to include in the model");
+    
+    // TODO: have this ingest the TSV file and use it to set up the model
+    //models.codon.MSS.LoadClassesCodon (file)
+    console.log("can obtain files!");
+    busted.do_mss = TRUE;
+}
+// END HANNAH CODE
+
+
 
 KeywordArgument ("grid-size", "The number of points in the initial distributional guess for likelihood fitting", 250);
 busted.initial_grid.N = io.PromptUser ("The number of points in the initial distributional guess for likelihood fitting", 250, 1, 10000, TRUE);
@@ -324,8 +319,19 @@ utility.ForEachPair (busted.filter_specification, "_key_", "_value_",
 
 
 
+
+
 if (busted.multi_hit == "None") {
-    busted.model_generator = "models.codon.BS_REL.ModelDescription";
+    // BEGIN HANNAH CODE
+    if (busted.do_mss) {
+        // how do I make sure the model description accepts the MSS rate file?
+        // use models.codon.MSS.LoadEmpiricalRates (file) from MSS.bf to specify empirical codon rates to mss_template in BS_REL.bf
+        busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
+    } else {
+        busted.model_generator = "models.codon.BS_REL.ModelDescription";
+    }
+    // END HANNAH CODE
+   // busted.model_generator = "models.codon.BS_REL.ModelDescription";
    
 } else {
    lfunction busted.model.BS_REL_MH (type, code, rates) {        
@@ -355,15 +361,6 @@ if (busted.multi_hit == "None") {
     busted.model_generator = "busted.model.BS_REL_MH";
 }
 
-// BEGIN HANNAH CODE
-if (busted.do_mss) {
-    // how do I make sure the model description accepts the MSS rate file?
-    // use models.codon.MSS.LoadEmpiricalRates (file) from MSS.bf to specify empirical codon rates to mss_template in BS_REL.bf
-    busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
-    assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");
-    assert (busted.error_sink  == FALSE, "Error sink and MSS combination is currently not supported");  // if all this does is add an extra rate class, it should actually be fine
-}
-// END HANNAH CODE
 
 busted.baseline_model_generator = busted.model_generator;
 if (busted.do_srv) {
