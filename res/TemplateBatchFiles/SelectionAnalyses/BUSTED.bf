@@ -206,14 +206,11 @@ KeywordArgument ("mss-empirical", "Use empirically estimated MSS rates as a corr
 busted.mss_tsv = io.PromptUserForFilePath ("Use empirically estimated MSS rates as a correction when estimating omega?  [hit enter for no, or provide a file path to MSS corrections file (tsv)]"); 
 busted.do_mss = FALSE;
 if (busted.mss_tsv != "/dev/null") {
-    assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");
-    // TODO: figure out how to assign the file (or at least its rates) to the model
-    // KeywordArgument ("mss-rates", "The number alpha rate classes to include in the model");
-    // busted.mss_rate_classes = io.PromptUser ("The number alpha rate classes to include in the model");
-    
+    assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");    
+    assert(busted.do_srv == FALSE, "Synonymous rate variation and MSS combination is currently not supported");
     // TODO: have this ingest the TSV file and use it to set up the model
-    //models.codon.MSS.LoadClassesCodon (file)
-    console.log("can obtain files!");
+    //models.codon.MSS.LoadEmpiricalRates (busted.mss_tsv);
+
     busted.do_mss = TRUE;
 }
 // END HANNAH CODE
@@ -324,8 +321,8 @@ utility.ForEachPair (busted.filter_specification, "_key_", "_value_",
 if (busted.multi_hit == "None") {
     // BEGIN HANNAH CODE
     if (busted.do_mss) {
-        // how do I make sure the model description accepts the MSS rate file?
-        // use models.codon.MSS.LoadEmpiricalRates (file) from MSS.bf to specify empirical codon rates to mss_template in BS_REL.bf
+        // specify empirical codon rates to mss_template in BS_REL.bf
+        models.codon.MSS.LoadEmpiricalRates (busted.mss_tsv);
         busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
     } else {
         busted.model_generator = "models.codon.BS_REL.ModelDescription";
