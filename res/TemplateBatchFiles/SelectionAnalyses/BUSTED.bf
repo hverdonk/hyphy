@@ -202,15 +202,13 @@ KeywordArgument ("mss-empirical", "Use empirically estimated MSS rates as a corr
     /** the use of null as the default argument means that the default expectation is for the 
         argument to be missing, i.e. we are not using an MSS file to correct the omega estimates
     */
-
-busted.mss_tsv = io.PromptUserForFilePath ("Use empirically estimated MSS rates as a correction when estimating omega?  [hit enter for no, or provide a file path to MSS corrections file (tsv)]"); 
+busted.mss_tsv = io.PromptUserForString ("Use empirically estimated MSS rates as a correction when estimating omega?  [hit enter for no, or provide a file path to MSS corrections file (tsv)]");
 busted.do_mss = FALSE;
 if (busted.mss_tsv != "/dev/null") {
     assert (busted.multi_hit == "None", "Multiple hit and MSS combination is currently not supported");    
     assert(busted.do_srv == FALSE, "Synonymous rate variation and MSS combination is currently not supported");
     // TODO: have this ingest the TSV file and use it to set up the model
     //models.codon.MSS.LoadEmpiricalRates (busted.mss_tsv);
-
     busted.do_mss = TRUE;
 }
 // END HANNAH CODE

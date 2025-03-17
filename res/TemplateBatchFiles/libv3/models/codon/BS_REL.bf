@@ -120,7 +120,7 @@ lfunction models.codon.BS_REL_MSS.ModelDescription(type, code, components) {
 
     // same as specifying "Empirical" partitioning to model.codon.MSS.prompt_and_define_freq in MSS.bf
     //this is where I have to pass along the TSV file's values to template
-    mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates ("filename"));
+    mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates ("fake_temp_filename"));
 
 
     for (key, value; in; mss_template) {
