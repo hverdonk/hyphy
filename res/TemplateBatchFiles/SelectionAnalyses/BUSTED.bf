@@ -319,10 +319,38 @@ utility.ForEachPair (busted.filter_specification, "_key_", "_value_",
 if (busted.multi_hit == "None") {
     // BEGIN HANNAH CODE
     if (busted.do_mss) {
-        // specify empirical codon rates to mss_template in BS_REL.bf
-        // MY busted.mss_tsv FILE GETS WIPED AT SOME POINT HERE OR PRIOR TO HERE???
-        models.codon.MSS.LoadEmpiricalRates (busted.mss_tsv);
-        busted.model_generator = "models.codon.BS_REL_MSS.ModelDescription";
+        lfunction model.BS_REL_MSS(type, code, rates) {
+            //io.CheckAssertion ('`&type`==terms.global', 'Only ' + ^'terms.global' + ' model type is supported for BS_REL_MSS');
+            //codon_classes = models.codon.MapCode(code);
+            template = models.codon.BS_REL.ModelDescription(type, code, rates);
+
+            // same as specifying "Empirical" partitioning to model.codon.MSS.prompt_and_define_freq in MSS.bf
+            //this is where I have to pass along the TSV file's values to template
+            mss_template = models.codon.MSS.ModelDescription(type, code, models.codon.MSS.LoadEmpiricalRates (null));  // busted.mss_tsv
+
+            // TODO: this section isn't combining the two model descriptions correctly
+            for (key, value; in; mss_template) {
+                console.log(key);
+                template[key] = mss_template[key];
+            }
+            
+            //template = models.codon.BS_REL.ModelDescription(type, code, rates);
+            //utility.getGlobalValue("terms.description"): "The branch-site mixture of N Multiclass Synonymous Substitution (MSS) codon-substitution models coupled with the general time reversible (GTR) model of nucleotide substitution",
+            template [utility.getGlobalValue("terms.model.defineQ")] = "models.codon.BS_REL_MSS._DefineQ";
+
+            // template [utility.getGlobalValue("terms.model.rate_generator")] = "function rate_generator (fromChar, toChar, namespace, model_type, model) {
+            //    return models.codon.MSS._GenerateRate (fromChar, toChar, namespace, model_type, model[utility.getGlobalValue('terms.translation_table')],
+            //     // TODO: do I need to modify these terms for MSS?
+            //     //'alpha', utility.getGlobalValue('terms.parameters.synonymous_rate'),
+            //     //'beta_' + component, terms.AddCategory (utility.getGlobalValue('terms.parameters.nonsynonymous_rate'), component),
+            //     //'omega' + component, terms.AddCategory (utility.getGlobalValue('terms.parameters.omega_ratio'), component),
+            //    );}";
+
+            return template;
+        }
+        
+        busted.model_generator = "busted.model.BS_REL_MSS";
+
     } else {
         busted.model_generator = "models.codon.BS_REL.ModelDescription";
     }
