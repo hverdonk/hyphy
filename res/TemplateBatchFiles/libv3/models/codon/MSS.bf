@@ -447,7 +447,7 @@ lfunction models.codon.MSS.LoadEmpiricalRates (file) {
     SetDialogPrompt ("A TSV file with three columns (Codon1, Codon2, Empirical Rate) which is used to define relative synonymous substitution rates");
     classes = io.ReadDelimitedFile (file, "\t", TRUE);
     headers = utility.Array1D(classes[^'terms.io.header']);
-    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 2nd column is the codon, 3rd is the class for this codon");
+    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 1st column is Codon1, 2nd column is Codon2, 3rd is the empirical rate for this codon pair");
     codon_pairs = {};
     for (_record_; in; classes [^"terms.io.rows"]) {
         if (_record_[0] < _record_[1]) {
@@ -468,7 +468,7 @@ lfunction models.codon.MSS.LoadClasses (file) {
     SetDialogPrompt ("A TSV file with three columns (AA, Codon, Class) which is used to partition synonymous substitutions into groups");
     classes = io.ReadDelimitedFile (file, "\t", TRUE);
     headers = utility.Array1D(classes[^'terms.io.header']);
-    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 2nd column is the codon, 3rd is the class for this codon");
+    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 1st column is the amino acid, 2nd column is the codon, 3rd is the class for this codon");
     codons_by_class = {};
     for (_record_; in; classes [^"terms.io.rows"]) {
         codons_by_class[_record_[1]] = _record_[2];
@@ -496,7 +496,7 @@ lfunction models.codon.MSS.LoadClassesCodon (file) {
     SetDialogPrompt ("A TSV file with three columns (Codon1, Codon2, Class) which is used to partition synonymous substitutions into groups");
     classes = io.ReadDelimitedFile (file, "\t", TRUE);
     headers = utility.Array1D(classes[^'terms.io.header']);
-    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 2nd column is the codon, 3rd is the class for this codon");
+    io.CheckAssertion("`&headers`==3", "Expected a TSV file with exactly 3 columns; 1st column is Codon1, 2nd column is Codon2, 3rd is the class for this codon pair");
     codon_pairs = {};
     for (_record_; in; classes [^"terms.io.rows"]) {
         if (_record_[0] < _record_[1]) {
